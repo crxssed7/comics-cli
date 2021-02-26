@@ -320,6 +320,13 @@ namespace comictracker
         private static void ViewIssues(CVVolume volume)
         {
             // View issues
+
+            var issues = Service.GetIssuesByVolume(volume.Id.Value);
+
+            for (int i = 0; i < issues.Count; i++)
+            {
+                Console.WriteLine(issues[i].IssueNumber);
+            }
         }
 
         private static void OpeninVine(string url)
