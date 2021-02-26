@@ -164,9 +164,15 @@ namespace comictracker
 
         private static void ShowCollection()
         {
-            for (int i = 0; i < UserData.Comics.Count; i++)
+            if (UserData.Comics.Count > 0)
             {
-                Console.WriteLine(UserData.Comics[i].Name);
+                List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
+                for (int i = 0; i < UserData.Comics.Count; i++)
+                {
+                    items.Add(new ConsoleMenuItem<Comic>(UserData.Comics[i].Name, ShowVolumeDetails, UserData.Comics[i]));
+                }
+                var menu = new ConsoleMenu<string>("Your current collection", items);
+                menu.RunConsoleMenu();
             }
         }
 
@@ -212,6 +218,25 @@ namespace comictracker
             ShowVolumeOptions(volume);
         }
 
+        private static void ShowVolumeDetails(Comic volume)
+        {
+            Console.WriteLine();
+            // Name
+            WriteToConsole(volume.Name, false, ConsoleColor.DarkCyan);
+            Console.Write($" - {volume.Id}");
+            Console.WriteLine();
+            Console.WriteLine();
+            // Start Year
+            Console.WriteLine(volume.StartYear);
+            Console.WriteLine();
+            // Description
+            Console.WriteLine(volume.Description);
+            Console.WriteLine();
+            // URL
+            Console.WriteLine(volume.URL);
+            //ShowVolumeOptions(volume);
+        }
+
         public static string StripHTML(string input)
         {
             return Regex.Replace(input, "<[a-zA-Z/].*?>", "").Replace("amp;", "");
@@ -246,7 +271,7 @@ namespace comictracker
                     {
                         Id = volume.Id.Value,
                         Name = volume.Name,
-                        Description = volume.Description == null ? "No description provided" : StripHTML(volume.Description),
+                        Description = volume.Description == null ? "No description provided." : StripHTML(volume.Description),
                         StartYear = volume.StartYear,
                         URL = volume.SiteDetailUrl
                     };
@@ -288,7 +313,7 @@ namespace comictracker
                 {
                     Id = volume.Id.Value,
                     Name = volume.Name,
-                    Description = volume.Description == null ? "No description provided" : StripHTML(volume.Description),
+                    Description = volume.Description == null ? "No description provided." : StripHTML(volume.Description),
                     StartYear = volume.StartYear,
                     URL = volume.SiteDetailUrl
                 };
