@@ -64,8 +64,11 @@
   <ItemGroup>
     <Compile Include="ApiKey.cs" />
     <Compile Include="ConsoleMenu.cs" />
+    <Compile Include="Models\Comic.cs" />
+    <Compile Include="Models\Issue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserJSON.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
