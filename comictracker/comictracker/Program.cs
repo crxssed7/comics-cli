@@ -489,13 +489,13 @@ namespace comictracker
         private static void ShowIssueOptions(CVNetCore.Models.Issue issue)
         {
             // Mark as read, Open in Vine
-            Console.WriteLine("If you want to add this issue as 'read', you must first add the comic to your collection.");
             Console.WriteLine();
-            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
-            {
-                new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.SiteDetailUrl),
-                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
-            };
+            Console.WriteLine("If you want to add this issue as 'read', you must first add the comic to your collection, then open the comic with `comictracker coll`.");
+            Console.WriteLine();
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
+
+            items.Add(new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.SiteDetailUrl));
+            items.Add(new ConsoleMenuItem<string>("Exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>("Options", items);
             menu.RunConsoleMenu();
