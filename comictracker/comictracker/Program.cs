@@ -326,17 +326,37 @@ namespace comictracker
         {
             // View issues
             // Get Issues
+            Console.WriteLine(IssuesPage);
+
             var response = Service.GetIssuesByVolume(volume.Id.Value);
+            
+            int maximumPages = Convert.ToInt32(Math.Ceiling((double)response.Count / (double)IssuesPageSize));
+
+            Console.WriteLine(maximumPages);
 
             var issues = GetPage(response, IssuesPage, IssuesPageSize);
-
+            
             List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
-
+            
+            if (IssuesPage > 0)
+            {
+                // Add the '... load less' button
+                items.Add(new ConsoleMenuItem<CVVolume>("... load less!", CallBackShowLessIssues, volume));
+            }
+            
             for (int i = 0; i < issues.Count; i++)
             {
-                ConsoleMenuItem<CVNetCore.Models.Issue> item = new ConsoleMenuItem<CVNetCore.Models.Issue>($"Issue: {issues[i].IssueNumber} {issues[i].Name}", ShowIssueDetails, issues[i]);
+                ConsoleMenuItem<CVNetCore.Models.Issue> item = new ConsoleMenuItem<CVNetCore.Models.Issue>($"Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
                 items.Add(item);
             }
+            
+            if (IssuesPage + 1 < maximumPages)
+            {
+                // Add load more button
+                items.Add(new ConsoleMenuItem<CVVolume>("... load more!", CallBackShowMoreIssues, volume));
+            }
+
+            items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>($"{volume.Name} Issues", items);
             menu.RunConsoleMenu();
@@ -360,6 +380,18 @@ namespace comictracker
         private static void ShowIssueDetails(CVNetCore.Models.Issue issues)
         {
 
+        }
+
+        private static void CallBackShowLessIssues(CVVolume volume)
+        {
+            IssuesPage--;
+            ViewIssues(volume);
+        }
+
+        private static void CallBackShowMoreIssues(CVVolume volume)
+        {
+            IssuesPage++;
+            ViewIssues(volume);
         }
     }
 }
