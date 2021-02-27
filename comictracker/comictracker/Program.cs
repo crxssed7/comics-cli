@@ -146,9 +146,12 @@ namespace comictracker
                     if (i == 0 && CurrentPage > 0)
                     {
                         items.Add(new ConsoleMenuItem<string>("... load less!", CallBackShowLessResults, query));
+                        items.Add(new ConsoleMenuSeperator());
                     }
                     items.Add(new ConsoleMenuItem<CVVolume>($"{CurrentPage + i + 1} {volumes[i].Name} ({volumes[i].StartYear}): {volumes[i].Id}", CallBack, volumes[i]));
                 }
+
+                items.Add(new ConsoleMenuSeperator());
 
                 if (volumes.Count == 10)
                     items.Add(new ConsoleMenuItem<string>("... load more!", CallBackShowMoreResults, query));
@@ -173,6 +176,10 @@ namespace comictracker
                 {
                     items.Add(new ConsoleMenuItem<Comic>(UserData.Comics[i].Name, ShowVolumeDetails, UserData.Comics[i]));
                 }
+
+                items.Add(new ConsoleMenuSeperator());
+                items.Add(new ConsoleMenuItem<string>("Exit", CallBackExitSearch, ""));
+
                 var menu = new ConsoleMenu<string>("Your current collection", items);
                 menu.RunConsoleMenu();
             }
@@ -255,6 +262,7 @@ namespace comictracker
                     new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
                     existingComic.Count() == 0 ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
+                    new ConsoleMenuSeperator(),
                     new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
@@ -268,6 +276,7 @@ namespace comictracker
                     new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
                     new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
+                    new ConsoleMenuSeperator(),
                     new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
@@ -282,6 +291,7 @@ namespace comictracker
                 new ConsoleMenuItem<Comic>("View Issues", ViewIssues, comic),
                 new ConsoleMenuItem<Comic>("Remove Comic", RemoveComic, comic),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, comic.URL),
+                new ConsoleMenuSeperator(),
                 new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
             };
             var menu = new ConsoleMenu<string>("Options", items);
@@ -360,6 +370,7 @@ namespace comictracker
             {
                 // Add the '... load less' button
                 items.Add(new ConsoleMenuItem<CVVolume>("... load less!", CallBackShowLessIssues, volume));
+                items.Add(new ConsoleMenuSeperator());
             }
             
             for (int i = 0; i < issues.Count; i++)
@@ -367,7 +378,9 @@ namespace comictracker
                 ConsoleMenuItem<CVNetCore.Models.Issue> item = new ConsoleMenuItem<CVNetCore.Models.Issue>($"Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
                 items.Add(item);
             }
-            
+
+            items.Add(new ConsoleMenuSeperator());
+
             if (IssuesPage + 1 < maximumPages)
             {
                 // Add load more button
@@ -393,6 +406,7 @@ namespace comictracker
             {
                 // Add the '... load less' button
                 items.Add(new ConsoleMenuItem<Comic>("... load less!", CallBackShowLessIssues, comic));
+                items.Add(new ConsoleMenuSeperator());
             }
 
             for (int i = 0; i < issues.Count; i++)
@@ -400,6 +414,8 @@ namespace comictracker
                 ConsoleMenuItem<Models.Issue> item = new ConsoleMenuItem<Models.Issue>($"Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
                 items.Add(item);
             }
+
+            items.Add(new ConsoleMenuSeperator());
 
             if (IssuesPage + 1 < maximumPages)
             {
@@ -479,6 +495,7 @@ namespace comictracker
             {
                 issue.Read == false ? new ConsoleMenuItem<Models.Issue>("Mark as read", MarkIssueRead, issue) : new ConsoleMenuItem<Models.Issue>("Mark as unread", MarkIssueUnRead, issue),
                 new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.URL),
+                new ConsoleMenuSeperator(),
                 new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
             };
 
@@ -495,6 +512,7 @@ namespace comictracker
             List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
 
             items.Add(new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.SiteDetailUrl));
+            items.Add(new ConsoleMenuSeperator());
             items.Add(new ConsoleMenuItem<string>("Exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>("Options", items);
