@@ -205,7 +205,7 @@ namespace comictracker
             Console.WriteLine();
             // Name
             WriteToConsole(volume.Name, false, ConsoleColor.DarkCyan);
-            Console.Write($" - {volume.Id}");
+            Console.Write($" - id: {volume.Id}");
             Console.WriteLine();
             Console.WriteLine();
             // Start Year
@@ -225,7 +225,7 @@ namespace comictracker
             Console.WriteLine();
             // Name
             WriteToConsole(volume.Name, false, ConsoleColor.DarkCyan);
-            Console.Write($" - {volume.Id}");
+            Console.Write($" - id: {volume.Id}");
             Console.WriteLine();
             Console.WriteLine();
             // Start Year
@@ -236,7 +236,7 @@ namespace comictracker
             Console.WriteLine();
             // URL
             Console.WriteLine(volume.URL);
-            //ShowVolumeOptions(volume);
+            ShowVolumeOptions(volume);
         }
 
         public static string StripHTML(string input)
@@ -273,6 +273,19 @@ namespace comictracker
                 var menu = new ConsoleMenu<string>("Options", items);
                 menu.RunConsoleMenu();
             }
+        }
+
+        private static void ShowVolumeOptions(Comic comic)
+        {
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+            {
+                new ConsoleMenuItem<Comic>("View Issues", ViewIssues, comic),
+                new ConsoleMenuItem<Comic>("Remove Comic", RemoveComic, comic),
+                new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, comic.URL),
+                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+            };
+            var menu = new ConsoleMenu<string>("Options", items);
+            menu.RunConsoleMenu();
         }
 
         private static void AddComic(CVVolume volume)
@@ -322,17 +335,22 @@ namespace comictracker
             Serialize();
         }
 
+        private static void RemoveComic(Comic comic)
+        {
+            // Remove the comic
+            Console.WriteLine("Removing comic...");
+            UserData.Comics.Remove(comic);
+            Console.WriteLine("Comic Removed!");
+            Serialize();
+        }
+
         private static void ViewIssues(CVVolume volume)
         {
             // View issues
             // Get Issues
-            Console.WriteLine(IssuesPage);
-
             var response = Service.GetIssuesByVolume(volume.Id.Value);
             
             int maximumPages = Convert.ToInt32(Math.Ceiling((double)response.Count / (double)IssuesPageSize));
-
-            Console.WriteLine(maximumPages);
 
             var issues = GetPage(response, IssuesPage, IssuesPageSize);
             
@@ -362,6 +380,39 @@ namespace comictracker
             menu.RunConsoleMenu();
         }
 
+        private static void ViewIssues(Comic comic)
+        {
+            // View issues
+            int maximumPages = Convert.ToInt32(Math.Ceiling((double)comic.Issues.Count / (double)IssuesPageSize));
+
+            var issues = GetPage(comic.Issues, IssuesPage, IssuesPageSize);
+
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
+
+            if (IssuesPage > 0)
+            {
+                // Add the '... load less' button
+                items.Add(new ConsoleMenuItem<Comic>("... load less!", CallBackShowLessIssues, comic));
+            }
+
+            for (int i = 0; i < issues.Count; i++)
+            {
+                ConsoleMenuItem<Models.Issue> item = new ConsoleMenuItem<Models.Issue>($"Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
+                items.Add(item);
+            }
+
+            if (IssuesPage + 1 < maximumPages)
+            {
+                // Add load more button
+                items.Add(new ConsoleMenuItem<Comic>("... load more!", CallBackShowMoreIssues, comic));
+            }
+
+            items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
+
+            var menu = new ConsoleMenu<string>($"{comic.Name} Issues", items);
+            menu.RunConsoleMenu();
+        }
+
         private static void OpeninVine(string url)
         {
             System.Diagnostics.Process.Start(url);
@@ -377,9 +428,46 @@ namespace comictracker
             return list.Skip(page * pageSize).Take(pageSize).ToList();
         }
 
-        private static void ShowIssueDetails(CVNetCore.Models.Issue issues)
+        private static void ShowIssueDetails(CVNetCore.Models.Issue issue)
         {
+            Console.WriteLine();
+            // Name
+            string name = issue.Name == null ? "Untitled" : issue.Name;
+            WriteToConsole($"Issue {issue.IssueNumber} - {name}", false, ConsoleColor.DarkGreen);
+            Console.Write($" - id: {issue.Id}");
+            Console.WriteLine();
+            Console.WriteLine();
+            // Start Year
+            Console.WriteLine(issue.IssueYear);
+            Console.WriteLine();
+            // Description
+            string description = issue.Description == null ? "No description provided." : issue.Description;
+            Console.WriteLine(StripHTML(description));
+            Console.WriteLine();
+            // URL
+            Console.WriteLine(issue.SiteDetailUrl);
+            //ShowVolumeOptions(volume);
+        }
 
+        private static void ShowIssueDetails(Models.Issue issue)
+        {
+            Console.WriteLine();
+            // Name
+            string name = issue.Name == null ? "Untitled" : issue.Name;
+            WriteToConsole($"Issue {issue.IssueNumber} - {name}", false, ConsoleColor.DarkGreen);
+            Console.Write($" - id: {issue.Id}");
+            Console.WriteLine();
+            Console.WriteLine();
+            // Start Year
+            Console.WriteLine(issue.IssueYear);
+            Console.WriteLine();
+            // Description
+            string description = issue.Description == null ? "No description provided." : issue.Description;
+            Console.WriteLine(StripHTML(description));
+            Console.WriteLine();
+            // URL
+            Console.WriteLine(issue.URL);
+            //ShowVolumeOptions(volume);
         }
 
         private static void CallBackShowLessIssues(CVVolume volume)
@@ -392,6 +480,18 @@ namespace comictracker
         {
             IssuesPage++;
             ViewIssues(volume);
+        }
+
+        private static void CallBackShowLessIssues(Comic comic)
+        {
+            IssuesPage--;
+            ViewIssues(comic);
+        }
+
+        private static void CallBackShowMoreIssues(Comic comic)
+        {
+            IssuesPage++;
+            ViewIssues(comic);
         }
     }
 }
