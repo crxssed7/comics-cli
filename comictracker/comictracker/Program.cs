@@ -20,6 +20,8 @@ namespace comictracker
         public static ComicVine Service = new ComicVine(ApiKey.Key);
 
         private static int CurrentPage = 0;
+        private static int IssuesPage = 0;
+        private static int IssuesPageSize = 10;
 
         private static string JSONLocation = "";
 
@@ -335,6 +337,11 @@ namespace comictracker
         private static void OpeninVine(string url)
         {
             System.Diagnostics.Process.Start(url);
+        }
+
+        IList<Models.Issue> GetPage(IList<Models.Issue> list, int page, int pageSize)
+        {
+            return list.Skip(page * pageSize).Take(pageSize).ToList();
         }
     }
 }
