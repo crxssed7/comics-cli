@@ -419,7 +419,8 @@ namespace comictracker
 
             for (int i = 0; i < issues.Count; i++)
             {
-                ConsoleMenuItem<Models.Issue> item = new ConsoleMenuItem<Models.Issue>($"Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
+                string tick = issues[i].Read == true ? "/ " : "";
+                ConsoleMenuItem<Models.Issue> item = new ConsoleMenuItem<Models.Issue>($"{tick}Issue: {issues[i].IssueNumber} - {issues[i].Name}", ShowIssueDetails, issues[i]);
                 items.Add(item);
             }
 
