@@ -244,102 +244,80 @@ namespace comictracker
 
         private static void ShowVolumeOptions(CVVolume volume)
         {
-            // Add comic, View Issues, Open in ComicVine, Exit
-            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+            if (UserData.Comics.Count > 0)
             {
-                new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume),
-                new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
-                new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
-                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
-            };
-            var menu = new ConsoleMenu<string>("Options", items);
-            menu.RunConsoleMenu();
+                var existingComic = UserData.Comics.Where(comicLib => comicLib.Id == volume.Id).First();
+                // Add comic, View Issues, Open in ComicVine, Exit
+                List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+                {
+                    new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
+                    existingComic == null ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
+                    new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
+                    new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                };
+                var menu = new ConsoleMenu<string>("Options", items);
+                menu.RunConsoleMenu();
+            }
+            else
+            {
+                // There is nothing in the library add it without checking if its already there
+                List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+                {
+                    new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
+                    new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume),
+                    new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
+                    new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                };
+                var menu = new ConsoleMenu<string>("Options", items);
+                menu.RunConsoleMenu();
+            }
         }
 
         private static void AddComic(CVVolume volume)
         {
             // Add a comic 
-            if (UserData.Comics.Count > 0)
+            Console.WriteLine("Adding comic...");
+
+            Comic comic = new Comic()
             {
-                // Check if already in collection dumbass
-                var existingComic = UserData.Comics.Where(comicLib => comicLib.Id == volume.Id).First();
-                if (existingComic == null)
-                {
-                    Console.WriteLine("Adding comic...");
+                Id = volume.Id.Value,
+                Name = volume.Name,
+                Description = volume.Description == null ? "No description provided." : StripHTML(volume.Description),
+                StartYear = volume.StartYear,
+                URL = volume.SiteDetailUrl
+            };
 
-                    Comic comic = new Comic()
-                    {
-                        Id = volume.Id.Value,
-                        Name = volume.Name,
-                        Description = volume.Description == null ? "No description provided." : StripHTML(volume.Description),
-                        StartYear = volume.StartYear,
-                        URL = volume.SiteDetailUrl
-                    };
+            var issues = Service.GetIssuesByVolume(volume.Id.Value);
 
-                    var issues = Service.GetIssuesByVolume(volume.Id.Value);
-
-                    for (int i = 0; i < issues.Count; i++)
-                    {
-                        Models.Issue issue = new Models.Issue()
-                        {
-                            Id = issues[i].Id.Value,
-                            Name = issues[i].Name,
-                            Description = issues[i].Description,
-                            IssueNumber = issues[i].IssueNumber,
-                            IssueYear = issues[i].IssueYear,
-                            URL = issues[i].SiteDetailUrl
-                        };
-                        comic.Issues.Add(issue);
-                    }
-
-                    UserData.Comics.Add(comic);
-
-                    Console.WriteLine("Comic added!");
-
-                    Serialize();
-                }
-                else
-                {
-                    Console.WriteLine("That comic is already a part of your collection.");
-                }
-            }
-            else
+            for (int i = 0; i < issues.Count; i++)
             {
-                // Add the comic anyway as its empty
-
-                Console.WriteLine("Adding comic...");
-
-                Comic comic = new Comic()
+                Models.Issue issue = new Models.Issue()
                 {
-                    Id = volume.Id.Value,
-                    Name = volume.Name,
-                    Description = volume.Description == null ? "No description provided." : StripHTML(volume.Description),
-                    StartYear = volume.StartYear,
-                    URL = volume.SiteDetailUrl
+                    Id = issues[i].Id.Value,
+                    Name = issues[i].Name,
+                    Description = issues[i].Description,
+                    IssueNumber = issues[i].IssueNumber,
+                    IssueYear = issues[i].IssueYear,
+                    URL = issues[i].SiteDetailUrl
                 };
-
-                var issues = Service.GetIssuesByVolume(volume.Id.Value);
-
-                for (int i = 0; i < issues.Count; i++)
-                {
-                    Models.Issue issue = new Models.Issue()
-                    {
-                        Id = issues[i].Id.Value,
-                        Name = issues[i].Name,
-                        Description = issues[i].Description,
-                        IssueNumber = issues[i].IssueNumber,
-                        IssueYear = issues[i].IssueYear,
-                        URL = issues[i].SiteDetailUrl
-                    };
-                    comic.Issues.Add(issue);
-                }
-
-                UserData.Comics.Add(comic);
-
-                Console.WriteLine("Comic added!");
-
-                Serialize();
+                comic.Issues.Add(issue);
             }
+
+            UserData.Comics.Add(comic);
+
+            Console.WriteLine("Comic added!");
+
+            Serialize();
+        }
+
+        private static void RemoveComic(CVVolume volume)
+        {
+            // Remove the comic
+            Console.WriteLine("Removing comic...");
+            var comic = UserData.Comics.Where(c => c.Id == volume.Id.Value).First();
+            UserData.Comics.Remove(comic);
+            Console.WriteLine("Comic Removed!");
+            Serialize();
         }
 
         private static void ViewIssues(CVVolume volume)
