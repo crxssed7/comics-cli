@@ -92,6 +92,7 @@ namespace ConsoleUI
             {
                 Console.BackgroundColor = ConsoleColor.Gray;
                 Console.ForegroundColor = ConsoleColor.Black;
+                //Console.Write(" ->");
             }
 
             string text = this._menuItems[itemIndex].Name;

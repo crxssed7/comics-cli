@@ -21,5 +21,7 @@ namespace comictracker.Models
         public string URL { get; set; } = "";
 
         public bool Read { get; set; } = false;
+
+        public string VolumeName { get; set; } = "";
     }
 }
