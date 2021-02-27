@@ -248,12 +248,12 @@ namespace comictracker
         {
             if (UserData.Comics.Count > 0)
             {
-                var existingComic = UserData.Comics.Where(comicLib => comicLib.Id == volume.Id).First();
+                var existingComic = UserData.Comics.Where(comicLib => comicLib.Id == volume.Id);
                 // Add comic, View Issues, Open in ComicVine, Exit
                 List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
                 {
                     new ConsoleMenuItem<CVVolume>("View Issues", ViewIssues, volume),
-                    existingComic == null ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
+                    existingComic.Count() == 0 ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
                     new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
                 };
@@ -446,7 +446,7 @@ namespace comictracker
             Console.WriteLine();
             // URL
             Console.WriteLine(issue.SiteDetailUrl);
-            //ShowVolumeOptions(volume);
+            ShowIssueOptions(issue);
         }
 
         private static void ShowIssueDetails(Models.Issue issue)
@@ -457,6 +457,8 @@ namespace comictracker
             WriteToConsole($"Issue {issue.IssueNumber} - {name}", false, ConsoleColor.DarkGreen);
             Console.Write($" - id: {issue.Id}");
             Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(issue.Read == true ? "Read" : "Not read");
             Console.WriteLine();
             // Start Year
             Console.WriteLine(issue.IssueYear);
@@ -477,6 +479,21 @@ namespace comictracker
             {
                 issue.Read == false ? new ConsoleMenuItem<Models.Issue>("Mark as read", MarkIssueRead, issue) : new ConsoleMenuItem<Models.Issue>("Mark as unread", MarkIssueUnRead, issue),
                 new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.URL),
+                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+            };
+
+            var menu = new ConsoleMenu<string>("Options", items);
+            menu.RunConsoleMenu();
+        }
+
+        private static void ShowIssueOptions(CVNetCore.Models.Issue issue)
+        {
+            // Mark as read, Open in Vine
+            Console.WriteLine("If you want to add this issue as 'read', you must first add the comic to your collection.");
+            Console.WriteLine();
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+            {
+                new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.SiteDetailUrl),
                 new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
             };
 
@@ -510,12 +527,18 @@ namespace comictracker
 
         private static void MarkIssueRead(Models.Issue issue)
         {
-
+            Console.WriteLine("Marking comic as read...");
+            issue.Read = true;
+            Console.WriteLine("Comic read!");
+            Serialize();
         }
 
         private static void MarkIssueUnRead(Models.Issue issue)
         {
-
+            Console.WriteLine("Marking comic as unread...");
+            issue.Read = false;
+            Console.WriteLine("Comic unread!");
+            Serialize();
         }
     }
 }
