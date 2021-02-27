@@ -467,7 +467,21 @@ namespace comictracker
             Console.WriteLine();
             // URL
             Console.WriteLine(issue.URL);
-            //ShowVolumeOptions(volume);
+            ShowIssueOptions(issue);
+        }
+
+        private static void ShowIssueOptions(Models.Issue issue)
+        {
+            // Mark as read, Open in Vine
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>()
+            {
+                issue.Read == false ? new ConsoleMenuItem<Models.Issue>("Mark as read", MarkIssueRead, issue) : new ConsoleMenuItem<Models.Issue>("Mark as unread", MarkIssueUnRead, issue),
+                new ConsoleMenuItem<string>("Open in Vine", OpeninVine, issue.URL),
+                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+            };
+
+            var menu = new ConsoleMenu<string>("Options", items);
+            menu.RunConsoleMenu();
         }
 
         private static void CallBackShowLessIssues(CVVolume volume)
@@ -492,6 +506,16 @@ namespace comictracker
         {
             IssuesPage++;
             ViewIssues(comic);
+        }
+
+        private static void MarkIssueRead(Models.Issue issue)
+        {
+
+        }
+
+        private static void MarkIssueUnRead(Models.Issue issue)
+        {
+
         }
     }
 }
