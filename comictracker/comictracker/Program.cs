@@ -325,13 +325,21 @@ namespace comictracker
         private static void ViewIssues(CVVolume volume)
         {
             // View issues
+            // Get Issues
+            var response = Service.GetIssuesByVolume(volume.Id.Value);
 
-            var issues = Service.GetIssuesByVolume(volume.Id.Value);
+            var issues = GetPage(response, IssuesPage, IssuesPageSize);
+
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
 
             for (int i = 0; i < issues.Count; i++)
             {
-                Console.WriteLine(issues[i].IssueNumber);
+                ConsoleMenuItem<CVNetCore.Models.Issue> item = new ConsoleMenuItem<CVNetCore.Models.Issue>($"Issue: {issues[i].IssueNumber} {issues[i].Name}", ShowIssueDetails, issues[i]);
+                items.Add(item);
             }
+
+            var menu = new ConsoleMenu<string>($"{volume.Name} Issues", items);
+            menu.RunConsoleMenu();
         }
 
         private static void OpeninVine(string url)
@@ -339,9 +347,19 @@ namespace comictracker
             System.Diagnostics.Process.Start(url);
         }
 
-        IList<Models.Issue> GetPage(IList<Models.Issue> list, int page, int pageSize)
+        private static IList<Models.Issue> GetPage(IList<Models.Issue> list, int page, int pageSize)
         {
             return list.Skip(page * pageSize).Take(pageSize).ToList();
+        }
+
+        private static IList<CVNetCore.Models.Issue> GetPage(IList<CVNetCore.Models.Issue> list, int page, int pageSize)
+        {
+            return list.Skip(page * pageSize).Take(pageSize).ToList();
+        }
+
+        private static void ShowIssueDetails(CVNetCore.Models.Issue issues)
+        {
+
         }
     }
 }
