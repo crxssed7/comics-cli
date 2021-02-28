@@ -17,7 +17,7 @@ namespace comictracker
 {
     class Program
     {
-        public static ComicVine Service = new ComicVine(ApiKey.Key);
+        public static ComicVine Service;
 
         private static int CurrentPage = 0;
         private static int IssuesPage = 0;
@@ -45,6 +45,7 @@ namespace comictracker
                         break;
                     case "search":
                         // Implement search
+                        Login();
                         Search(args[1]);
                         break;
                     case "coll":
@@ -70,6 +71,11 @@ namespace comictracker
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("     To get started with Comic Tracker, type `comictracker help`");
             }
+        }
+
+        private static void Login()
+        {
+            Service = new ComicVine(ApiKey.Key);
         }
 
         private static void WriteToConsole(string text, bool returnLine, ConsoleColor forToColor = ConsoleColor.Gray, ConsoleColor backToColor = ConsoleColor.Black)
