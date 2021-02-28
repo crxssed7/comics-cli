@@ -72,7 +72,7 @@ namespace comictracker
             }
         }
 
-        private static void WriteToConsole(string text, bool returnLine, ConsoleColor forToColor = ConsoleColor.Gray, ConsoleColor forOgColor = ConsoleColor.Gray, ConsoleColor backToColor = ConsoleColor.Black, ConsoleColor backOgColor = ConsoleColor.Black)
+        private static void WriteToConsole(string text, bool returnLine, ConsoleColor forToColor = ConsoleColor.Gray, ConsoleColor backToColor = ConsoleColor.Black)
         {
             Console.ForegroundColor = forToColor;
             Console.BackgroundColor = backToColor;
@@ -82,8 +82,7 @@ namespace comictracker
             else
                 Console.Write(text);
 
-            Console.ForegroundColor = forOgColor;
-            Console.BackgroundColor = backOgColor;
+            Console.ResetColor();
         }
 
         private static void Deserialize()
@@ -138,7 +137,10 @@ namespace comictracker
         {
             Console.Clear();
             Query = query;
-            WriteToConsole("Searching for comics...", true, ConsoleColor.Cyan);
+            WriteToConsole($"Searching for comics (", false, ConsoleColor.Cyan);
+            WriteToConsole($"{query}", false, ConsoleColor.Blue);
+            WriteToConsole($")...", false, ConsoleColor.Cyan);
+            Console.WriteLine();
             var volumes = Service.GetVolumesByName(query, CurrentPage);
 
             List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
