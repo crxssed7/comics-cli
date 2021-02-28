@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ConsoleUI
 {
-    // 
+    // Credits to @arthurvaverko : https://github.com/arthurvaverko/ConsoleMenu
     public class ConsoleMenu<T>
     {
         private ConsoleMenuItem[] _menuItems;

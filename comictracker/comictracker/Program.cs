@@ -304,6 +304,7 @@ namespace comictracker
                 new ConsoleMenuItem<Comic>("Remove Comic", RemoveComic, comic),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, comic.URL),
                 new ConsoleMenuSeperator(),
+                new ConsoleMenuItem<string>("... back to collection", ShowCollection, ""),
                 new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
             };
             var menu = new ConsoleMenu<string>("Options", items);
@@ -435,14 +436,14 @@ namespace comictracker
             }
 
             items.Add(new ConsoleMenuSeperator());
-            items.Add(new ConsoleMenuItem<Comic>("... back to comic", ShowVolumeDetails, comic));
-
+            
             if (IssuesPage + 1 < maximumPages)
             {
                 // Add load more button
                 items.Add(new ConsoleMenuItem<Comic>("... load more!", CallBackShowMoreIssues, comic));
             }
 
+            items.Add(new ConsoleMenuItem<Comic>("... back to comic", ShowVolumeDetails, comic));
             items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>($"{comic.Name} Issues - Page {IssuesPage + 1}", items);
