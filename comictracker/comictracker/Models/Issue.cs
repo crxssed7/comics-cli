@@ -23,5 +23,7 @@ namespace comictracker.Models
         public bool Read { get; set; } = false;
 
         public string VolumeName { get; set; } = "";
+
+        public int VolumeId { get; set; } = 0;
     }
 }

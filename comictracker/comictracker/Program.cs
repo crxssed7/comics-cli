@@ -181,7 +181,7 @@ namespace comictracker
                 }
 
                 items.Add(new ConsoleMenuSeperator());
-                items.Add(new ConsoleMenuItem<string>("Exit", CallBackExitSearch, ""));
+                items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
                 var menu = new ConsoleMenu<string>("Your current collection", items);
                 menu.RunConsoleMenu();
@@ -267,7 +267,7 @@ namespace comictracker
                     existingComic.Count() == 0 ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
                     new ConsoleMenuSeperator(),
-                    new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                    new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
                 menu.RunConsoleMenu();
@@ -281,7 +281,7 @@ namespace comictracker
                     new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
                     new ConsoleMenuSeperator(),
-                    new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                    new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
                 menu.RunConsoleMenu();
@@ -296,7 +296,7 @@ namespace comictracker
                 new ConsoleMenuItem<Comic>("Remove Comic", RemoveComic, comic),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, comic.URL),
                 new ConsoleMenuSeperator(),
-                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
             };
             var menu = new ConsoleMenu<string>("Options", items);
             menu.RunConsoleMenu();
@@ -328,7 +328,8 @@ namespace comictracker
                     IssueNumber = issues[i].IssueNumber,
                     IssueYear = issues[i].IssueYear,
                     URL = issues[i].SiteDetailUrl,
-                    VolumeName = comic.Name
+                    VolumeName = comic.Name,
+                    VolumeId = comic.Id
                 };
                 comic.Issues.Add(issue);
             }
@@ -387,6 +388,7 @@ namespace comictracker
             }
 
             items.Add(new ConsoleMenuSeperator());
+            items.Add(new ConsoleMenuItem<CVVolume>("... back to comic", ShowVolumeDetails, volume));
 
             if (IssuesPage + 1 < maximumPages)
             {
@@ -425,6 +427,7 @@ namespace comictracker
             }
 
             items.Add(new ConsoleMenuSeperator());
+            items.Add(new ConsoleMenuItem<Comic>("... back to comic", ShowVolumeDetails, comic));
 
             if (IssuesPage + 1 < maximumPages)
             {
@@ -511,7 +514,8 @@ namespace comictracker
                 issue.Read == false ? new ConsoleMenuItem<Models.Issue>("Mark as read", MarkIssueRead, issue) : new ConsoleMenuItem<Models.Issue>("Mark as unread", MarkIssueUnRead, issue),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, issue.URL),
                 new ConsoleMenuSeperator(),
-                new ConsoleMenuItem<string>("Exit", CallBackExitSearch, "")
+                new ConsoleMenuItem<int>("... back to comic", GetComicById, issue.VolumeId),
+                new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
             };
 
             var menu = new ConsoleMenu<string>("Options", items);
@@ -528,7 +532,8 @@ namespace comictracker
 
             items.Add(new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, issue.SiteDetailUrl));
             items.Add(new ConsoleMenuSeperator());
-            items.Add(new ConsoleMenuItem<string>("Exit", CallBackExitSearch, ""));
+            items.Add(new ConsoleMenuItem<CVVolume>("... back to comic", ShowVolumeDetails, issue.Volume));
+            items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>("Options", items);
             menu.RunConsoleMenu();
@@ -572,6 +577,18 @@ namespace comictracker
             issue.Read = false;
             Console.WriteLine("Comic unread!");
             Serialize();
+        }
+
+        private static void GetComicById(int id)
+        {
+            if (UserData.Comics.Count > 0)
+            {
+                var comic = UserData.Comics.Where(c => c.Id == id);
+                if (comic.Count() > 0)
+                {
+                    ShowVolumeDetails(comic.First());
+                }
+            }
         }
     }
 }
