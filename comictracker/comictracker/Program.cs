@@ -24,6 +24,7 @@ namespace comictracker
         private static int IssuesPageSize = 10;
 
         private static string JSONLocation = "";
+        private static string Query = "";
 
         public static UserJSON UserData = new UserJSON();
 
@@ -48,7 +49,7 @@ namespace comictracker
                         break;
                     case "coll":
                         // Show Collection
-                        ShowCollection();
+                        ShowCollection("");
                         break;
                 }
             }
@@ -136,6 +137,7 @@ namespace comictracker
         private static void Search(string query)
         {
             Console.Clear();
+            Query = query;
             WriteToConsole("Searching for comics...", true, ConsoleColor.Cyan);
             var volumes = Service.GetVolumesByName(query, CurrentPage);
 
@@ -158,6 +160,7 @@ namespace comictracker
                 if (volumes.Count == 10)
                     items.Add(new ConsoleMenuItem<string>("... load more!", CallBackShowMoreResults, query));
 
+                items.Add(new ConsoleMenuItem<string>("... go to collection", ShowCollection, ""));
                 items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, query));
 
                 var menu = new ConsoleMenu<string>("Your query returned these results", items);
@@ -169,7 +172,7 @@ namespace comictracker
             }
         }
 
-        private static void ShowCollection()
+        private static void ShowCollection(string tmp)
         {
             if (UserData.Comics.Count > 0)
             {
@@ -267,6 +270,8 @@ namespace comictracker
                     existingComic.Count() == 0 ? new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume) : new ConsoleMenuItem<CVVolume>("Remove Comic", RemoveComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
                     new ConsoleMenuSeperator(),
+                    new ConsoleMenuItem<string>("... back to results", Search, Query),
+                    new ConsoleMenuItem<string>("... go to collecion", ShowCollection, ""),
                     new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
@@ -281,6 +286,7 @@ namespace comictracker
                     new ConsoleMenuItem<CVVolume>("Add Comic", AddComic, volume),
                     new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, volume.SiteDetailUrl),
                     new ConsoleMenuSeperator(),
+                    new ConsoleMenuItem<string>("... go to collecion", ShowCollection, ""),
                     new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
                 };
                 var menu = new ConsoleMenu<string>("Options", items);
