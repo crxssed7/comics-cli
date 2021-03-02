@@ -209,11 +209,25 @@ namespace comictracker
                     // Add load more button
                     items.Add(new ConsoleMenuItem<string>("... load more!", ShowMoreCollection, tmp));
                 }
+                items.Add(new ConsoleMenuItem<string>("... sort by name", SortCollByName, tmp));
+                items.Add(new ConsoleMenuItem<string>("... sort by year", SortCollByYear, tmp));
                 items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
                 var menu = new ConsoleMenu<string>("Your current collection", items);
                 menu.RunConsoleMenu();
             }
+        }
+
+        private static void SortCollByName(string tmp)
+        {
+            UserData.Comics = UserData.Comics.OrderBy(comic => comic.Name).ToList();
+            ShowCollection(tmp);
+        }
+
+        private static void SortCollByYear(string tmp)
+        {
+            UserData.Comics = UserData.Comics.OrderBy(comic => comic.StartYear).ToList();
+            ShowCollection(tmp);
         }
 
         private static void ShowMoreCollection(string tmp)
