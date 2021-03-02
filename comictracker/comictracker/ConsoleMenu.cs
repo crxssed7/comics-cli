@@ -91,7 +91,7 @@ namespace ConsoleUI
         {
             if (itemIndex == selectedItemIndex)
             {
-                Console.BackgroundColor = ConsoleColor.Gray;
+                Console.BackgroundColor = ConsoleColor.Cyan;
                 Console.ForegroundColor = ConsoleColor.Black;
                 //Console.Write(" ->");
             }
