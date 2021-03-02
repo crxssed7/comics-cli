@@ -21,8 +21,9 @@ namespace comictracker
 
         private static int CurrentPage = 0;
         private static int IssuesPage = 0;
-        private static int IssuesPageSize = 10;
-
+        private static int PageSize = 10;
+        private static int CollectionPage = 0;
+        
         private static string JSONLocation = "";
         private static string Query = "";
 
@@ -186,17 +187,45 @@ namespace comictracker
             {
                 Console.Clear();
                 List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
-                for (int i = 0; i < UserData.Comics.Count; i++)
+
+                int maximumPages = Convert.ToInt32(Math.Ceiling((double)UserData.Comics.Count / (double)PageSize));
+
+                if (CollectionPage > 0)
                 {
-                    items.Add(new ConsoleMenuItem<Comic>(UserData.Comics[i].Name, ShowVolumeDetails, UserData.Comics[i]));
+                    // Add the '... load less' button
+                    items.Add(new ConsoleMenuItem<string>("... load less!", ShowLessCollection, tmp));
+                    items.Add(new ConsoleMenuSeperator());
+                }
+
+                var comics = PaginateCollection(UserData.Comics, CollectionPage, PageSize);
+                for (int i = 0; i < comics.Count; i++)
+                {
+                    items.Add(new ConsoleMenuItem<Comic>(comics[i].Name, ShowVolumeDetails, comics[i]));
                 }
 
                 items.Add(new ConsoleMenuSeperator());
+                if (CollectionPage + 1 < maximumPages)
+                {
+                    // Add load more button
+                    items.Add(new ConsoleMenuItem<string>("... load more!", ShowMoreCollection, tmp));
+                }
                 items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
                 var menu = new ConsoleMenu<string>("Your current collection", items);
                 menu.RunConsoleMenu();
             }
+        }
+
+        private static void ShowMoreCollection(string tmp)
+        {
+            CollectionPage++;
+            ShowCollection(tmp);
+        }
+
+        private static void ShowLessCollection(string tmp)
+        {
+            CollectionPage--;
+            ShowCollection("");
         }
 
         private static void CallBack(CVVolume volume)
@@ -382,9 +411,9 @@ namespace comictracker
             Console.Clear();
             var response = Service.GetIssuesByVolume(volume.Id.Value);
             
-            int maximumPages = Convert.ToInt32(Math.Ceiling((double)response.Count / (double)IssuesPageSize));
+            int maximumPages = Convert.ToInt32(Math.Ceiling((double)response.Count / (double)PageSize));
 
-            var issues = GetPage(response, IssuesPage, IssuesPageSize);
+            var issues = GetPage(response, IssuesPage, PageSize);
             
             List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
             
@@ -421,9 +450,9 @@ namespace comictracker
         {
             // View issues
             Console.Clear();
-            int maximumPages = Convert.ToInt32(Math.Ceiling((double)comic.Issues.Count / (double)IssuesPageSize));
+            int maximumPages = Convert.ToInt32(Math.Ceiling((double)comic.Issues.Count / (double)PageSize));
 
-            var issues = GetPage(comic.Issues, IssuesPage, IssuesPageSize);
+            var issues = GetPage(comic.Issues, IssuesPage, PageSize);
 
             List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
 
@@ -467,6 +496,11 @@ namespace comictracker
         }
 
         private static IList<CVNetCore.Models.Issue> GetPage(IList<CVNetCore.Models.Issue> list, int page, int pageSize)
+        {
+            return list.Skip(page * pageSize).Take(pageSize).ToList();
+        }
+
+        private static IList<Comic> PaginateCollection(IList<Comic> list, int page, int pageSize)
         {
             return list.Skip(page * pageSize).Take(pageSize).ToList();
         }
