@@ -577,7 +577,8 @@ namespace comictracker
                 issue.Read == false ? new ConsoleMenuItem<Models.Issue>("Mark as read", MarkIssueRead, issue) : new ConsoleMenuItem<Models.Issue>("Mark as unread", MarkIssueUnRead, issue),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, issue.URL),
                 new ConsoleMenuSeperator(),
-                new ConsoleMenuItem<int>("... back to comic", GetComicById, issue.VolumeId),
+                new ConsoleMenuItem<int>("... back to comic", GetComicByIdAndShow, issue.VolumeId),
+                new ConsoleMenuItem<Comic>("... back to issues", ViewIssues, GetComicById(issue.VolumeId)),
                 new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
             };
 
@@ -596,6 +597,7 @@ namespace comictracker
             items.Add(new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, issue.SiteDetailUrl));
             items.Add(new ConsoleMenuSeperator());
             items.Add(new ConsoleMenuItem<CVVolume>("... back to comic", ShowVolumeDetails, issue.Volume));
+            items.Add(new ConsoleMenuItem<CVVolume>("... back to issues", ViewIssues, issue.Volume));
             items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
 
             var menu = new ConsoleMenu<string>("Options", items);
@@ -632,6 +634,7 @@ namespace comictracker
             issue.Read = true;
             Console.WriteLine("Comic read!");
             Serialize();
+            ShowIssueDetails(issue);
         }
 
         private static void MarkIssueUnRead(Models.Issue issue)
@@ -640,18 +643,26 @@ namespace comictracker
             issue.Read = false;
             Console.WriteLine("Comic unread!");
             Serialize();
+            ShowIssueDetails(issue);
         }
 
-        private static void GetComicById(int id)
+        private static void GetComicByIdAndShow(int id)
+        {
+            ShowVolumeDetails(GetComicById(id));
+        }
+
+        private static Comic GetComicById(int id)
         {
             if (UserData.Comics.Count > 0)
             {
                 var comic = UserData.Comics.Where(c => c.Id == id);
                 if (comic.Count() > 0)
                 {
-                    ShowVolumeDetails(comic.First());
+                    return comic.First();
                 }
             }
+
+            return null;
         }
     }
 }
