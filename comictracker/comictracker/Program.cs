@@ -131,7 +131,7 @@ namespace comictracker
 
         private static void Help()
         {
-            WriteToConsole("Hello, I've come to help you!", true, ConsoleColor.Cyan, Console.ForegroundColor);
+            WriteToConsole("Hello, I've come to help you!", true, ConsoleColor.Cyan);
             Console.WriteLine();
             Console.WriteLine("Command          Arguments          Description");
             Console.WriteLine("----------------------------------------------------------------------------");
