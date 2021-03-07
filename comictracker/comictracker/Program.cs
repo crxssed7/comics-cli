@@ -670,12 +670,16 @@ namespace comictracker
         public static void UpdateComics(Comic comic)
         {
             Login();
+            Console.WriteLine("Updating...");
             var issues = Service.GetIssuesByVolume(comic.Id);
+            Console.WriteLine(issues.Count);
 
             if (issues.Count > comic.Issues.Count)
             {
-                for (int i = comic.Issues.Count + 1; i < issues.Count; i++)
+                Console.WriteLine("New issues found...");
+                for (int i = comic.Issues.Count; i < issues.Count; i++)
                 {
+                    Console.WriteLine($"New issue {issues[i].IssueNumber}");
                     Models.Issue issue = new Models.Issue()
                     {
                         Id = issues[i].Id.Value,
