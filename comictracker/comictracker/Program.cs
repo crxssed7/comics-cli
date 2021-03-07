@@ -301,6 +301,7 @@ namespace comictracker
             Console.WriteLine();
             // URL
             Console.WriteLine(volume.URL);
+            Console.WriteLine();
             ShowVolumeOptions(volume);
         }
 
@@ -353,6 +354,7 @@ namespace comictracker
                 new ConsoleMenuItem<Comic>("Remove Comic", RemoveComic, comic),
                 new ConsoleMenuItem<string>("Open in ComicVine", OpeninVine, comic.URL),
                 new ConsoleMenuSeperator(),
+                new ConsoleMenuItem<Comic>("... update issues", UpdateComics, comic),
                 new ConsoleMenuItem<string>("... back to collection", ShowCollection, ""),
                 new ConsoleMenuItem<string>("... exit", CallBackExitSearch, "")
             };
@@ -663,6 +665,33 @@ namespace comictracker
             }
 
             return null;
+        }
+
+        public static void UpdateComics(Comic comic)
+        {
+            Login();
+            var issues = Service.GetIssuesByVolume(comic.Id);
+
+            if (issues.Count > comic.Issues.Count)
+            {
+                for (int i = comic.Issues.Count + 1; i < issues.Count; i++)
+                {
+                    Models.Issue issue = new Models.Issue()
+                    {
+                        Id = issues[i].Id.Value,
+                        Name = issues[i].Name,
+                        Description = issues[i].Description,
+                        IssueNumber = issues[i].IssueNumber,
+                        IssueYear = issues[i].IssueYear,
+                        URL = issues[i].SiteDetailUrl,
+                        VolumeName = comic.Name,
+                        VolumeId = comic.Id
+                    };
+                    comic.Issues.Add(issue);
+                }
+            }
+
+            ShowVolumeDetails(comic);
         }
     }
 }
