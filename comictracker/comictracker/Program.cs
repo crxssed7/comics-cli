@@ -46,12 +46,30 @@ namespace comictracker
                         break;
                     case "search":
                         // Implement search
-                        Login();
-                        Search(args[1]);
+                        if (args.Length == 2)
+                        {
+                            Login();
+                            Search(args[1]);
+                        }
+                        else
+                        {
+                            WriteToConsole("You need to enter a comic to search for. Try again.", false, ConsoleColor.Red, Console.BackgroundColor);
+                        }
                         break;
                     case "coll":
                         // Show Collection
                         ShowCollection("");
+                        break;
+                    case "s-coll":
+                        // Search a collection
+                        if (args.Length == 2)
+                        {
+                            SearchCollection(args[1]);
+                        }
+                        else
+                        {
+                            WriteToConsole("You need to enter a comic to search for. Try again.", false, ConsoleColor.Red, Console.BackgroundColor);
+                        }
                         break;
                 }
             }
@@ -185,37 +203,52 @@ namespace comictracker
         {
             if (UserData.Comics.Count > 0)
             {
-                Console.Clear();
-                List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
-
-                int maximumPages = Convert.ToInt32(Math.Ceiling((double)UserData.Comics.Count / (double)PageSize));
-
-                if (CollectionPage > 0)
-                {
-                    // Add the '... load less' button
-                    items.Add(new ConsoleMenuItem<string>("... load less!", ShowLessCollection, tmp));
-                    items.Add(new ConsoleMenuSeperator());
-                }
-
-                var comics = PaginateCollection(UserData.Comics, CollectionPage, PageSize);
-                for (int i = 0; i < comics.Count; i++)
-                {
-                    items.Add(new ConsoleMenuItem<Comic>(comics[i].Name, ShowVolumeDetails, comics[i]));
-                }
-
-                items.Add(new ConsoleMenuSeperator());
-                if (CollectionPage + 1 < maximumPages)
-                {
-                    // Add load more button
-                    items.Add(new ConsoleMenuItem<string>("... load more!", ShowMoreCollection, tmp));
-                }
-                items.Add(new ConsoleMenuItem<string>("... sort by name", SortCollByName, tmp));
-                items.Add(new ConsoleMenuItem<string>("... sort by year", SortCollByYear, tmp));
-                items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
-
-                var menu = new ConsoleMenu<string>("Your current collection", items);
-                menu.RunConsoleMenu();
+                ShowComicList(UserData.Comics);
             }
+        }
+
+        private static void SearchCollection(string query)
+        {
+            if (UserData.Comics.Count > 0)
+            {
+                var comics = UserData.Comics.Where(comic => comic.Name.ToLower().Contains(query.ToLower())).ToList();
+
+                ShowComicList(comics);
+            }
+        }
+
+        private static void ShowComicList(List<Comic> comicsToShow)
+        {
+            Console.Clear();
+            List<ConsoleMenuItem> items = new List<ConsoleMenuItem>();
+
+            int maximumPages = Convert.ToInt32(Math.Ceiling((double)comicsToShow.Count / (double)PageSize));
+
+            if (CollectionPage > 0)
+            {
+                // Add the '... load less' button
+                items.Add(new ConsoleMenuItem<List<Comic>>("... load less!", ShowLessCollection, comicsToShow));
+                items.Add(new ConsoleMenuSeperator());
+            }
+
+            var comics = PaginateCollection(comicsToShow, CollectionPage, PageSize);
+            for (int i = 0; i < comics.Count; i++)
+            {
+                items.Add(new ConsoleMenuItem<Comic>(comics[i].Name, ShowVolumeDetails, comics[i]));
+            }
+
+            items.Add(new ConsoleMenuSeperator());
+            if (CollectionPage + 1 < maximumPages)
+            {
+                // Add load more button
+                items.Add(new ConsoleMenuItem<List<Comic>>("... load more!", ShowMoreCollection, comicsToShow));
+            }
+            items.Add(new ConsoleMenuItem<string>("... sort by name", SortCollByName, ""));
+            items.Add(new ConsoleMenuItem<string>("... sort by year", SortCollByYear, ""));
+            items.Add(new ConsoleMenuItem<string>("... exit", CallBackExitSearch, ""));
+
+            var menu = new ConsoleMenu<string>("Your current collection", items);
+            menu.RunConsoleMenu();
         }
 
         private static void SortCollByName(string tmp)
@@ -230,16 +263,16 @@ namespace comictracker
             ShowCollection(tmp);
         }
 
-        private static void ShowMoreCollection(string tmp)
+        private static void ShowMoreCollection(List<Comic> comics)
         {
             CollectionPage++;
-            ShowCollection(tmp);
+            ShowComicList(comics);
         }
 
-        private static void ShowLessCollection(string tmp)
+        private static void ShowLessCollection(List<Comic> comics)
         {
             CollectionPage--;
-            ShowCollection("");
+            ShowComicList(comics);
         }
 
         private static void CallBack(CVVolume volume)
