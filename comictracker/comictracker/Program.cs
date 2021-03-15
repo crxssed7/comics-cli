@@ -46,7 +46,7 @@ namespace comictracker
                         break;
                     case "search":
                         // Implement search
-                        if (args.Length == 2)
+                        if (args.Length >= 2)
                         {
                             Login();
                             Search(args[1]);
@@ -62,13 +62,28 @@ namespace comictracker
                         break;
                     case "s-coll":
                         // Search a collection
-                        if (args.Length == 2)
+                        if (args.Length >= 2)
                         {
                             SearchCollection(args[1]);
                         }
                         else
                         {
                             WriteToConsole("You need to enter a comic to search for. Try again.", false, ConsoleColor.Red, Console.BackgroundColor);
+                        }
+                        break;
+                    case "id":
+                        if (args.Length >= 2)
+                        {
+                            try
+                            {
+                                Login();
+                                int id = Convert.ToInt32(args[1]);
+                                Id(id);
+                            }
+                            catch
+                            {
+                                WriteToConsole("There was an error retrieving the comic by ID. Please make sure your input is a number.", true, ConsoleColor.Red, Console.BackgroundColor);
+                            }
                         }
                         break;
                 }
@@ -730,6 +745,19 @@ namespace comictracker
             }
 
             ShowVolumeDetails(comic);
+        }
+
+        private static void Id(int id)
+        {
+            try
+            {
+                var comic = Service.GetVolumeDetails(id);
+                ShowVolumeDetails(comic);
+            }
+            catch
+            {
+                WriteToConsole("Comic with that Id was not found.", true, ConsoleColor.Red, Console.BackgroundColor);
+            }
         }
     }
 }
