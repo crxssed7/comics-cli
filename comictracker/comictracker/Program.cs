@@ -167,11 +167,12 @@ namespace comictracker
             WriteToConsole("Hello, I've come to help you!", true, ConsoleColor.Cyan, Console.BackgroundColor);
             Console.WriteLine();
             Console.WriteLine("Command          Arguments          Description");
-            Console.WriteLine("----------------------------------------------------------------------------");
-            Console.WriteLine("help             N/A                Shows info on all available commands");
+            Console.WriteLine("---------------------------------------------------------------------------------------------");
+            Console.WriteLine("help             N/A                Shows info on all available commands ");
             Console.WriteLine("search           comic-name         Searches for a comic ");
             Console.WriteLine("coll             N/A                Shows all the comics in your collection ");
             Console.WriteLine("s-coll           comic-name         Searches your collection ");
+            Console.WriteLine("id               comicvine-id       Gets a specific comic based off of the give ComicVine id ");
         }
 
         private static void Search(string query)
