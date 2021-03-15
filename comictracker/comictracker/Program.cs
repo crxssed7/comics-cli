@@ -754,9 +754,10 @@ namespace comictracker
                 var comic = Service.GetVolumeDetails(id);
                 ShowVolumeDetails(comic);
             }
-            catch
+            catch (Exception e)
             {
-                WriteToConsole("Comic with that Id was not found.", true, ConsoleColor.Red, Console.BackgroundColor);
+                //WriteToConsole("Comic with that Id was not found.", true, ConsoleColor.Red, Console.BackgroundColor);
+                WriteToConsole(e.Message, true, ConsoleColor.Red, Console.BackgroundColor);
             }
         }
     }

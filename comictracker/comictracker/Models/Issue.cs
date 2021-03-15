@@ -8,7 +8,7 @@ namespace comictracker.Models
 {
     public class Issue
     {
-        public float? IssueNumber { get; set; }
+        public string IssueNumber { get; set; }
 
         public string Name { get; set; } = "";
 
